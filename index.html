@@ -53,7 +53,7 @@
 
     fetchSchoolsAndSubjects().then(([subjects, schools]) => {
       Object.keys(subjects).forEach(function(school) {
-        if (school.startsWith('U')) {
+        if (school.startsWith("U") || school.startsWith("SHU")) {
           content += `<h3>${schools[school].name}</h3>`;
           content += "<table><tbody><tr>";
           let counter = 0;
