@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <title>NYU Courses Explorer</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+  <style>
+    pre {
+      white-space: pre-wrap;
+      word-wrap: break-word;
+      border: 2px dashed;
+      border-radius: 5px;
+    }
+  </style>
+</head>
+
+<body>
+
+<h1>albert.zph.io</h1>
+<p>a minimalist NYU courses explorer based on schedge</p>
+
+<h2 id="search-title"></h2>
+<a href="../"><button type="button">Back to All Schools</button></a>
+
+<div id="courses">
+</div>
+
+<script>
+  const urlParams = new URLSearchParams(window.location.search);
+  const year = urlParams.get('year');
+  const semester = urlParams.get('semester');
+  const keyword = urlParams.get('keyword');
+  document.getElementById('search-title').innerHTML = `Search: ${keyword}`;
+
+  function loadCourses() {
+    let content = "";
+
+    fetch(`https://schedge.a1liu.com/${year}/${semester}/search?query=${keyword}&full=true`)
+        .then(response => response.json())
+        .then(courses => {
+          courses.sort(function(a, b) {
+            const re = /X/gi;
+            return a.deptCourseId.replace(re, '9') - b.deptCourseId.replace(re, '9');
+          });
+
+          courses.forEach(course => {
+            let sectionContent = "";
+
+            course.sections.forEach(section => {
+              const borderColor = section.status === 'Open' ? '#4caf50' : '#ff5252';
+
+              sectionContent += `<pre style="border-color:${borderColor}"><code>${section.name === course.name ? "" : section.name + "<br>"}Section ${section.code} #${section.registrationNumber} | ${section.type} | ${section.maxUnits} credits | ${section.status}<br>
+Instructor: ${section.instructors[0]} | Location: ${section.location}
+${section.notes ? "<br>Notes: " + section.notes : ""}
+${section.prerequisites ? "<br>" + section.prerequisites : ""}</code></pre>`;
+            })
+            content += `<details><summary>${course.subjectCode.school}-${course.subjectCode.code} ${course.deptCourseId} ${course.name}</summary> <p>${course.description || ""} ${sectionContent}</p> </details>`;
+          });
+
+          document.getElementById('courses').innerHTML = content;
+        });
+  }
+
+  loadCourses();
+</script>
+
+</body>
+</html>

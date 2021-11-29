@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8">
+  <title>NYU Courses Explorer</title>
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+</head>
+
+<body>
+
+<h1>albert.zph.io</h1>
+<p>a minimalist NYU courses explorer based on Schedge</p>
+
+<!--<h3>Semester:</h3>
+<form id="theme-form">
+  <input type="radio" value="auto" checked name="theme" id="theme-auto">
+  <label for="theme-auto">Current</label>
+</form>-->
+
+<!--<h3>Level:</h3>
+<form id="level-form">
+  <input type="radio" value="auto" checked name="undergrad" id="level-undergrad">
+  <label for="level-undergrad">Undergraduate</label>
+</form>-->
+
+<form method="get" action="search/">
+  <input type="hidden" name="year" id="search-year">
+  <input type="hidden" name="semester" id="search-semester">
+  <input type="text" name="keyword" placeholder="Search Course Title" style="display:inline">
+  <input type="submit" style="display:inline" value="Search">
+</form>
+
+<div id="subjects">
+</div>
+
+<script>
+  let year = 2022;
+  let semester = 'sp';
+
+  async function fetchSchoolsAndSubjects() {
+    const [subjectsResponse, schoolsResponse] = await Promise.all([
+      fetch("https://schedge.a1liu.com/subjects"),
+      fetch("https://schedge.a1liu.com/schools")
+    ]);
+    const subjects = await subjectsResponse.json();
+    const schools = await schoolsResponse.json();
+    return [subjects, schools];
+  }
+
+  function loadSubjects() {
+    let content = "";
+
+    fetchSchoolsAndSubjects().then(([subjects, schools]) => {
+      Object.keys(subjects).forEach(function(school) {
+        if (school.startsWith('U')) {
+          content += `<h3>${schools[school].name}</h3>`;
+          content += "<table><tbody><tr>";
+          let counter = 0;
+          Object.keys(subjects[school]).forEach(function(subject) {
+            content += `<td><a href="courses/?year=${year}&semester=${semester}&school=${school}&subject=${subject}">${subjects[school][subject].name} (${subject}-${school})</a></td>`;
+            counter++;
+            if (counter === 3) {
+              counter = 0;
+              content += "</tr><tr>";
+            }
+          });
+          content += "</tr></tbody></table>";
+        }
+      });
+      document.getElementById('subjects').innerHTML = content;
+    }).catch(error => {
+      // pass
+    });
+  }
+
+  function setSearchForm() {
+    document.getElementById('search-year').value = year;
+    document.getElementById('search-semester').value = semester;
+  }
+
+  loadSubjects();
+  setSearchForm();
+</script>
+
+</body>
+</html>
