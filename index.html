@@ -49,10 +49,26 @@
   }
 
   function loadSubjects() {
+    const priority = ['UA', 'UY'];
     let content = "";
 
     fetchSchoolsAndSubjects().then(([subjects, schools]) => {
-      Object.keys(subjects).forEach(function(school) {
+      priority.forEach(function(school) {
+        content += `<h3>${schools[school].name}</h3>`;
+        content += "<table><tbody><tr>";
+        let counter = 0;
+        Object.keys(subjects[school]).forEach(function(subject) {
+          content += `<td><a href="courses/?year=${year}&semester=${semester}&school=${school}&subject=${subject}">${subjects[school][subject].name} (${subject}-${school})</a></td>`;
+          counter++;
+          if (counter === 3) {
+            counter = 0;
+            content += "</tr><tr>";
+          }
+        });
+        content += "</tr></tbody></table>";
+      });
+
+      Object.keys(subjects).filter(key => !priority.includes(key)).forEach(function(school) {
         if (school.startsWith("U") || school.startsWith("SHU")) {
           content += `<h3>${schools[school].name}</h3>`;
           content += "<table><tbody><tr>";
