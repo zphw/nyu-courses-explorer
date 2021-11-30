@@ -18,7 +18,7 @@
 <body>
 
 <h1>albert.zph.io</h1>
-<p>a minimalist NYU courses explorer based on schedge</p>
+<p>a minimalist NYU courses explorer based on Schedge</p>
 
 <h2 id="search-title"></h2>
 <a href="../"><button type="button">Back to All Schools</button></a>
@@ -31,7 +31,7 @@
   const year = urlParams.get('year');
   const semester = urlParams.get('semester');
   const keyword = urlParams.get('keyword');
-  document.getElementById('search-title').innerHTML = `Search: ${keyword}`;
+  document.getElementById('search-title').innerHTML = `Search: ${keyword} - ${year} ${semester === 'fa' ? 'Fall' : 'Spring'}`;
 
   function loadCourses() {
     let content = "";

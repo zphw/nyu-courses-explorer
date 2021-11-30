@@ -12,11 +12,13 @@
 <h1>albert.zph.io</h1>
 <p>a minimalist NYU courses explorer based on Schedge</p>
 
-<!--<h3>Semester:</h3>
-<form id="theme-form">
-  <input type="radio" value="auto" checked name="theme" id="theme-auto">
-  <label for="theme-auto">Current</label>
-</form>-->
+<h4 style="display:inline">Year / Semester: </h4>
+<select id="select-year" style="display:inline">
+</select>
+<select id="select-semester" style="display:inline">
+  <option value="sp">Spring</option>
+  <option value="fa">Fall</option>
+</select>
 
 <!--<h3>Level:</h3>
 <form id="level-form">
@@ -24,6 +26,7 @@
   <label for="level-undergrad">Undergraduate</label>
 </form>-->
 
+<h3>Search Courses</h3>
 <form method="get" action="search/">
   <input type="hidden" name="year" id="search-year">
   <input type="hidden" name="semester" id="search-semester">
@@ -35,25 +38,60 @@
 </div>
 
 <script>
-  let year = 2022;
-  let semester = 'sp';
+  let year;
+  let semester;
+  let level = 'U';
+  let cache = null;
+
+  function renderSemesterSelectors() {
+    const startYear = 2020;
+    let toYear = new Date().getFullYear();
+    if (new Date().getMonth() >= 9)
+      toYear++;
+
+    let content = "";
+    for (let i = toYear; i >= startYear ; i--) {
+      content += `<option value="${i}">${i}</option>`;
+    }
+    document.getElementById('select-year').innerHTML = content;
+
+    year = toYear
+    document.getElementById('select-year').value = year;
+    if (new Date().getMonth() >= 9)
+      semester = 'sp';
+    else
+      semester = 'fa';
+    document.getElementById('select-semester').value = semester;
+  }
 
   async function fetchSchoolsAndSubjects() {
-    const [subjectsResponse, schoolsResponse] = await Promise.all([
-      fetch("https://schedge.a1liu.com/subjects"),
-      fetch("https://schedge.a1liu.com/schools")
-    ]);
-    const subjects = await subjectsResponse.json();
-    const schools = await schoolsResponse.json();
-    return [subjects, schools];
+    if (cache == null) {
+      const [subjectsResponse, schoolsResponse] = await Promise.all([
+        fetch("https://schedge.a1liu.com/subjects"),
+        fetch("https://schedge.a1liu.com/schools")
+      ]);
+      const subjects = await subjectsResponse.json();
+      const schools = await schoolsResponse.json();
+      cache = [subjects, schools];
+      return [subjects, schools];
+    } else {
+      return Promise.resolve(cache);
+    }
   }
 
   function loadSubjects() {
-    const priority = ['UA', 'UY'];
+    const schoolsWithPriority = ['A', 'Y'].map(element => level + element);
     let content = "";
 
     fetchSchoolsAndSubjects().then(([subjects, schools]) => {
-      priority.forEach(function(school) {
+
+      Object.keys(subjects)
+          .filter(key => (key.startsWith(level) || key.startsWith("SHU")) && !schoolsWithPriority.includes(key))
+          .forEach(function(school) {
+            schoolsWithPriority.push(school);
+          });
+
+      schoolsWithPriority.forEach(function(school) {
         content += `<h3>${schools[school].name}</h3>`;
         content += "<table><tbody><tr>";
         let counter = 0;
@@ -68,22 +106,6 @@
         content += "</tr></tbody></table>";
       });
 
-      Object.keys(subjects).filter(key => !priority.includes(key)).forEach(function(school) {
-        if (school.startsWith("U") || school.startsWith("SHU")) {
-          content += `<h3>${schools[school].name}</h3>`;
-          content += "<table><tbody><tr>";
-          let counter = 0;
-          Object.keys(subjects[school]).forEach(function(subject) {
-            content += `<td><a href="courses/?year=${year}&semester=${semester}&school=${school}&subject=${subject}">${subjects[school][subject].name} (${subject}-${school})</a></td>`;
-            counter++;
-            if (counter === 3) {
-              counter = 0;
-              content += "</tr><tr>";
-            }
-          });
-          content += "</tr></tbody></table>";
-        }
-      });
       document.getElementById('subjects').innerHTML = content;
     }).catch(error => {
       // pass
@@ -95,8 +117,22 @@
     document.getElementById('search-semester').value = semester;
   }
 
+  document.getElementById('select-year').onchange = function() {
+    year = this.value;
+    loadSubjects();
+    setSearchForm();
+  };
+
+  document.getElementById('select-semester').onchange = function() {
+    semester = this.value;
+    loadSubjects();
+    setSearchForm();
+  };
+
+  renderSemesterSelectors();
   loadSubjects();
   setSearchForm();
+
 </script>
 
 </body>

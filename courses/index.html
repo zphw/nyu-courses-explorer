@@ -18,7 +18,7 @@
 <body>
 
 <h1>albert.zph.io</h1>
-<p>a minimalist NYU courses explorer based on schedge</p>
+<p>a minimalist NYU courses explorer based on Schedge</p>
 
 <h2 id="subject-title"></h2>
 <a href="../"><button type="button">Back to All Schools</button></a>
@@ -32,7 +32,7 @@
   const semester = urlParams.get('semester');
   const school = urlParams.get('school');
   const subject = urlParams.get('subject');
-  document.getElementById('subject-title').innerHTML = `${subject}-${school} Courses`;
+  document.getElementById('subject-title').innerHTML = `${subject}-${school} Courses - ${year} ${semester === 'fa' ? 'Fall' : 'Spring'}`;
 
   function loadCourses() {
     let content = "";
@@ -51,8 +51,21 @@
             course.sections.forEach(section => {
               const borderColor = section.status === 'Open' ? '#4caf50' : '#ff5252';
 
+              let meetingTimes = '';
+              if (section.meetings != null) {
+                section.meetings.forEach((time) => {
+                  meetingTimes += new Intl.DateTimeFormat('en-US', { weekday:'short' }).format(new Date(time.beginDate)) + ' ';
+                });
+                // class begin time
+                meetingTimes += new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(new Date(section.meetings[0].beginDate));
+                meetingTimes += ' - ';
+                // class end time
+                meetingTimes += new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(new Date(new Date(section.meetings[0].beginDate).getTime() + section.meetings[0].minutesDuration*60000))
+              }
+
               sectionContent += `<pre style="border-color:${borderColor}"><code>${section.name === course.name ? "" : section.name + "<br>"}Section ${section.code} #${section.registrationNumber} | ${section.type} | ${section.maxUnits} credits | ${section.status}<br>
 Instructor: ${section.instructors[0]} | Location: ${section.location}
+${meetingTimes}
 ${section.notes ? "<br>Notes: " + section.notes : ""}
 ${section.prerequisites ? "<br>" + section.prerequisites : ""}</code></pre>`;
             })
