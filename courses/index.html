@@ -32,7 +32,7 @@
   const semester = urlParams.get('semester');
   const school = urlParams.get('school');
   const subject = urlParams.get('subject');
-  document.getElementById('subject-title').innerHTML = `${subject}-${school} Courses - ${year} ${semester === 'fa' ? 'Fall' : 'Spring'}`;
+  document.getElementById('subject-title').innerHTML = `${subject}-${school} Courses - ${semester === 'fa' ? 'Fall' : 'Spring'} ${year}`;
 
   function loadCourses() {
     let content = "";

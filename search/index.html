@@ -31,7 +31,7 @@
   const year = urlParams.get('year');
   const semester = urlParams.get('semester');
   const keyword = urlParams.get('keyword');
-  document.getElementById('search-title').innerHTML = `Search: ${keyword} - ${year} ${semester === 'fa' ? 'Fall' : 'Spring'}`;
+  document.getElementById('search-title').innerHTML = `Search: ${keyword} - ${semester === 'fa' ? 'Fall' : 'Spring'} ${year}`;
 
   function loadCourses() {
     let content = "";
