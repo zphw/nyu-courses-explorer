@@ -69,7 +69,7 @@ ${meetingTimes}
 ${section.notes ? "<br>Notes: " + section.notes : ""}
 ${section.prerequisites ? "<br>" + section.prerequisites : ""}</code></pre>`;
             })
-            content += `<details><summary>${course.subjectCode.school}-${course.subjectCode.code} ${course.deptCourseId} ${course.name}</summary> <p>${course.description || ""} ${sectionContent}</p> </details>`;
+            content += `<details><summary>${course.subjectCode.code}-${course.subjectCode.school} ${course.deptCourseId} ${course.name}</summary> <p>${course.description || ""} ${sectionContent}</p> </details>`;
           });
 
           document.getElementById('courses').innerHTML = content;
