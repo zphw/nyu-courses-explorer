@@ -6,11 +6,17 @@
   <title>NYU Courses Explorer</title>
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
   <style>
-    pre {
+    .desc {
       white-space: pre-wrap;
       word-wrap: break-word;
       border: 2px dashed;
       border-radius: 5px;
+      margin: 1em 0px;
+    }
+    .desc > code {
+      padding: 10px;
+      display: block;
+      overflow-x: auto;
     }
   </style>
 </head>
@@ -63,11 +69,19 @@
                 });
               }
 
-              sectionContent += `<pre style="border-color:${borderColor}"><code>${section.name === course.name ? "" : section.name + "<br>"}Section ${section.code} #${section.registrationNumber} | ${section.type} | ${section.maxUnits} credits | ${section.status}<br>
-Instructor: ${section.instructors[0]} | Location: ${section.location}
+              let instructorWithRMPLink;
+              if (typeof section.instructors[0] !== 'undefined' && section.instructors[0] && section.instructors[0] !== 'Staff') {
+                const temp = section.instructors[0].split(" ");
+                const RMPSearchName = temp[0] + " " + temp[temp.length-1];  // use only first and last name to search RMP
+                instructorWithRMPLink = `<a target="_blank" href="https://www.ratemyprofessors.com/search/teachers?query=${encodeURIComponent(RMPSearchName)}">${section.instructors[0]}</a>`;
+              } else
+                instructorWithRMPLink = section.instructors[0];
+
+              sectionContent += `<div class="desc" style="border-color:${borderColor}"><code>${section.name === course.name ? "" : section.name + "<br>"}Section ${section.code} #${section.registrationNumber} | ${section.type} | ${section.maxUnits} credits | ${section.status}<br>
+Instructor: ${instructorWithRMPLink} | Location: ${section.location}
 ${meetingTimes}
 ${section.notes ? "<br>Notes: " + section.notes : ""}
-${section.prerequisites ? "<br>" + section.prerequisites : ""}</code></pre>`;
+${section.prerequisites ? "<br>" + section.prerequisites : ""}</code></div>`;
             })
             content += `<details><summary>${course.subjectCode.code}-${course.subjectCode.school} ${course.deptCourseId} ${course.name}</summary> <p>${course.description || ""} ${sectionContent}</p> </details>`;
           });
