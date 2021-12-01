@@ -4,7 +4,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta charset="UTF-8">
   <title>NYU Courses Explorer</title>
-  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/water.css@2/out/water.min.css">
 </head>
 
 <body>
@@ -61,8 +61,12 @@
   function renderSemesterSelectors() {
     const startYear = 2020;
     let toYear = new Date().getFullYear();
-    if (new Date().getMonth() >= 9)
+    if (new Date().getMonth() >= 9) {
       toYear++;
+      semester = 'sp';
+    } else {
+      semester = 'fa';
+    }
 
     let content = "";
     for (let i = toYear; i >= startYear; i--) {
@@ -70,12 +74,8 @@
     }
     document.getElementById('select-year').innerHTML = content;
 
-    year = toYear
+    year = toYear;
     document.getElementById('select-year').value = year;
-    if (new Date().getMonth() >= 9)
-      semester = 'sp';
-    else
-      semester = 'fa';
     document.getElementById('select-semester').value = semester;
   }
 
