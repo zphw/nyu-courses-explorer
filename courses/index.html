@@ -83,6 +83,7 @@
                   meetingTimes += new Intl.DateTimeFormat('en-US', { hour: 'numeric', minute: 'numeric' }).format(Date.parse(time.beginDate.replace(' ', 'T')) + time.minutesDuration*60000)
                   meetingTimes += ' | ';
                 });
+                meetingTimes = meetingTimes.substring(0, meetingTimes.length - 3);
               }
 
               let instructorWithRMPLink;
