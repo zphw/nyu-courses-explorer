@@ -26,6 +26,14 @@
 <h1>albert.zph.io</h1>
 <p>a minimalist NYU courses explorer based on Schedge</p>
 
+<h3>Search Courses</h3>
+<form method="get" action="/search/">
+  <input type="hidden" name="year" id="search-year">
+  <input type="hidden" name="semester" id="search-semester">
+  <input type="text" name="keyword" id="search-keyword" placeholder="Search Course Title" style="display:inline">
+  <input type="submit" style="display:inline" value="Search">
+</form>
+
 <h2 id="search-title"></h2>
 <a href="../"><button type="button">Back to All Schools</button></a>
 
@@ -44,6 +52,11 @@
   const semester = urlParams.get('semester');
   const keyword = urlParams.get('keyword');
   document.getElementById('search-title').innerHTML = `Search: ${keyword} - ${semester === 'fa' ? 'Fall' : 'Spring'} ${year}`;
+
+  // populate search form
+  document.getElementById('search-year').value = year;
+  document.getElementById('search-semester').value = semester;
+  document.getElementById('search-keyword').value = keyword;
 
   document.addEventListener("scroll", function () {
     const rootElement = document.documentElement;

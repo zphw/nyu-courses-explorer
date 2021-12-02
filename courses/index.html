@@ -26,6 +26,14 @@
 <h1>albert.zph.io</h1>
 <p>a minimalist NYU courses explorer based on Schedge</p>
 
+<h4 style="display:inline">Change Semester / Year: </h4>
+<select id="select-semester" style="display:inline">
+  <option value="sp">Spring</option>
+  <option value="fa">Fall</option>
+</select>
+<select id="select-year" style="display:inline">
+</select>
+
 <h2 id="subject-title"></h2>
 <a href="../"><button type="button">Back to All Schools</button></a>
 
@@ -40,11 +48,10 @@
 
 <script>
   const urlParams = new URLSearchParams(window.location.search);
-  const year = urlParams.get('year');
-  const semester = urlParams.get('semester');
+  let year = urlParams.get('year');
+  let semester = urlParams.get('semester');
   const school = urlParams.get('school');
   const subject = urlParams.get('subject');
-  document.getElementById('subject-title').innerHTML = `${subject}-${school} Courses - ${semester === 'fa' ? 'Fall' : 'Spring'} ${year}`;
 
   document.addEventListener("scroll", function () {
     const rootElement = document.documentElement;
@@ -55,8 +62,24 @@
     }
   });
 
-  function loadCourses() {
+  function renderYearSelector() {
+    const startYear = 2020;
+    let toYear = new Date().getFullYear();
+    if (new Date().getMonth() >= 9)
+      toYear++;
+
     let content = "";
+    for (let i = toYear; i >= startYear; i--) {
+      content += `<option value="${i}">${i}</option>`;
+    }
+    document.getElementById('select-year').innerHTML = content;
+
+    document.getElementById('select-year').value = year;
+    document.getElementById('select-semester').value = semester;
+  }
+
+  function loadCourses() {
+    document.getElementById('subject-title').innerHTML = `${subject}-${school} Courses - ${semester === 'fa' ? 'Fall' : 'Spring'} ${year}`;
 
     fetch(`https://schedge.a1liu.com/${year}/${semester}/${school}/${subject}?full=true`)
         .then(response => response.json())
@@ -65,6 +88,8 @@
             const re = /X/gi;
             return a.deptCourseId.replace(re, '9') - b.deptCourseId.replace(re, '9');
           });
+
+          let content = "";
 
           courses.forEach(course => {
             let sectionContent = "";
@@ -107,7 +132,18 @@ ${section.prerequisites ? "<br>" + section.prerequisites : ""}</code></div>`;
         });
   }
 
+  document.getElementById('select-year').onchange = function() {
+    year = this.value;
+    loadCourses();
+  };
+
+  document.getElementById('select-semester').onchange = function() {
+    semester = this.value;
+    loadCourses();
+  };
+
   loadCourses();
+  renderYearSelector();
 </script>
 
 </body>
