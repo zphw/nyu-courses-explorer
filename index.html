@@ -20,11 +20,17 @@
 <select id="select-year" style="display:inline">
 </select>
 
-<!--<h3>Level:</h3>
-<form id="level-form">
-  <input type="radio" value="auto" checked name="undergrad" id="level-undergrad">
-  <label for="level-undergrad">Undergraduate</label>
-</form>-->
+<br>
+
+<h4 style="display:inline">Level: </h4>
+<div style="display:inline">
+  <input type="radio" id="level-u" name="level" value="U" checked>
+  <label for="level-u">Undergraduate</label>
+</div>
+<div style="display:inline">
+  <input type="radio" id="level-g" name="level" value="G">
+  <label for="level-g">Graduate</label>
+</div>
 
 <h3>Search Courses</h3>
 <form method="get" action="search/">
@@ -46,7 +52,7 @@
 <script>
   let year;
   let semester;
-  let level = 'U';
+  let level;
   let cache = null;
 
   document.addEventListener("scroll", function () {
@@ -58,7 +64,7 @@
       }
   });
 
-  function renderSemesterSelectors() {
+  function renderSelectors() {
     const startYear = 2020;
     let toYear = new Date().getFullYear();
     if (new Date().getMonth() >= 9) {
@@ -77,6 +83,10 @@
     year = toYear;
     document.getElementById('select-year').value = year;
     document.getElementById('select-semester').value = semester;
+
+    // get level from local storage
+    level = localStorage.getItem('level') || 'U';
+    document.getElementById(`level-${level.toLowerCase()}`).checked = true;
   }
 
   async function fetchSchoolsAndSubjects() {
@@ -101,7 +111,7 @@
     fetchSchoolsAndSubjects().then(([subjects, schools]) => {
 
       Object.keys(subjects)
-          .filter(key => (key.startsWith(level) || key.startsWith("SHU")) && !schoolsWithPriority.includes(key))
+          .filter(key => (key.startsWith(level) || key.startsWith("SHU")) && key in schools && !schoolsWithPriority.includes(key))
           .forEach(function(school) {
             schoolsWithPriority.push(school);
           });
@@ -123,7 +133,7 @@
 
       document.getElementById('subjects').innerHTML = content;
     }).catch(error => {
-      // pass
+      console.error(error);
     });
   }
 
@@ -144,7 +154,15 @@
     setSearchForm();
   };
 
-  renderSemesterSelectors();
+  document.querySelectorAll("input[name='level']").forEach((radio) => {
+    radio.addEventListener('change', function (e) {
+      level = e.target.value;
+      loadSubjects();
+      localStorage.setItem('level', level);
+    });
+  });
+
+  renderSelectors();
   loadSubjects();
   setSearchForm();
 
