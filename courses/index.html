@@ -65,7 +65,7 @@
   function renderYearSelector() {
     let toYear = new Date().getFullYear();
     const fromYear = toYear - 2;
-    if (new Date().getMonth() >= 10 || new Date().getMonth() <= 2)
+    if (new Date().getMonth() >= 10)
       toYear++;
 
     let content = "";

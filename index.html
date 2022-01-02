@@ -67,8 +67,10 @@
   function renderSelectors() {
     let toYear = new Date().getFullYear();
     const fromYear = toYear - 2;
-    if (new Date().getMonth() >= 10 || new Date().getMonth() <= 2) {
+    if (new Date().getMonth() >= 10) {
       toYear++;
+      semester = 'sp';
+    } else if (new Date().getMonth() <= 2) {
       semester = 'sp';
     } else {
       semester = 'fa';
