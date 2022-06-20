@@ -30,6 +30,8 @@
 <select id="select-semester" style="display:inline">
   <option value="sp">Spring</option>
   <option value="fa">Fall</option>
+  <option value="su">Summer</option>
+  <option value="ja">January</option>
 </select>
 <select id="select-year" style="display:inline">
 </select>
@@ -79,7 +81,22 @@
   }
 
   function loadCourses() {
-    document.getElementById('subject-title').innerHTML = `${subject}-${school} Courses - ${semester === 'fa' ? 'Fall' : 'Spring'} ${year}`;
+    let semester_name = '';
+    switch (semester) {
+      case 'fa':
+        semester_name = 'Fall';
+        break;
+      case 'sp':
+        semester_name = 'Spring';
+        break;
+      case 'su':
+        semester_name = 'Summer';
+        break;
+      case 'ja':
+        semester_name = 'January';
+        break;
+    }
+    document.getElementById('subject-title').innerHTML = `${subject}-${school} Courses - ${semester_name} ${year}`;
 
     fetch(`https://schedge.a1liu.com/${year}/${semester}/${school}/${subject}?full=true`)
         .then(response => response.json())
